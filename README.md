@@ -8,8 +8,10 @@ Goal of the project is to extract information via pattern matching with spaCy.
 
 ## Table of Contents
 - [Software](#software)
+- [Intro](#intro)
+- [Data](#data)
 - [Results](#results)
-- [Conclusion](#conclusion)
+- [Next Steps](#next steps)
 - [Acknowledgements](#acknowledgements)
 
 ## Software
@@ -31,7 +33,7 @@ Now, we will go to a site and check for news. So, I came across a news related t
 
 We will use this link for our project.
 
-## Importing and Downloading the Required Libraries
+# Importing and Downloading the Required Libraries
 For the project, in Google Colab, we will need to import,
 
 ```python
@@ -64,7 +66,7 @@ nlp = spacy.load('en_core_web_sm')
 
 The ‘_sm’ part indicates it is a smaller version of the library. There are two more versions of the ‘en_core_web’ library. You can check those out!
 
-## Getting the Data from the Site to our Notebook
+# Getting the Data from the Site to our Notebook
 
 It is time to define a function for getting the data from the news site to our Colab Notebook. We do it as,
 
@@ -78,7 +80,7 @@ def extract_article_from_url(url):
 
 We have used the Article method from the newspaper library. We are getting the text and the date of the news as output.
 
-## Creating the Function for Sentence Output
+# Creating the Function for Sentence Output
 
 Now, we will create the function that will give us the sentence output from our data for the matched word.
 
@@ -99,7 +101,7 @@ def sentence_giver(doc, start, end):
 
 Basically, what this function does is that it traverses till the nearest full stop in the article on both sides of the matched word. So, the indexes are reached both to the left and right of the matched word. Usually, we don’t see a full stop in the middle of the sentence a lot and mostly, it is at the ending of a sentence. Care is taken in case the matched word is in the first sentence or the last sentence of the article. So, we get proper sentences.
 
-## Creating the Functions for Extracting Locations
+# Creating the Functions for Extracting Locations
 Now, we are creating the function to extract the location of the incident. We do it as below.
 
 ```python
@@ -136,7 +138,7 @@ def l_detail_filter(data):
 
 As we see, for now, I have set pattern1 as ‘demonstrators’. So, the idea is that if we get ‘demonstrators’ word in a sentence near a location, we can be sure that some people have gathered at that location and this means something is happening at that place! I have only added pattern1 but there can be more patterns added which can further help in selecting more specific sentences and locations.
 
-## Creating the Functions for Extracting the Number of People Involved
+# Creating the Functions for Extracting the Number of People Involved
 So, now it’s time to get the number of people involved. The approach is very similar to what we did with locations. We first have the function for finding numbers.
 
 ```python
@@ -173,7 +175,7 @@ def n_detail_filter(data):
 
 Thus, we get the number of people involved. I have just used the pattern as ‘held in detention’ but other patterns can also be used.
 
-## Defining a Function to Get Results
+# Defining a Function to Get Results
 
 Now, it’s time to integrate our above individual functions as a part of another function which can be used to get all the results together. We define a function named ‘solver’ to do it.
 
@@ -189,7 +191,7 @@ def solver(doc):
 
 Now, we are ready to try this function on our data.
 
-## Getting the Outputs
+## Results
 Now, we will try to get the outputs. First, we will get the article and date through the ‘extract_article_from_url’ function. Then, we will convert the news content to a NLP object.
 
 ```python
@@ -227,4 +229,4 @@ I have just extracted ‘number of people’ and ‘location’ but other attrib
 
 
 ## Acknowledgements
-The work was done for Sesto Synergy and is the property of the company.
+The work was done as a self-motivated project.
