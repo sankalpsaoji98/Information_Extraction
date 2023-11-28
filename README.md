@@ -58,7 +58,7 @@ from newspaper import Article
 
 Now, since we imported spacy also, we will load the nlp module from it. It is done as below.
 
-```
+```python
 nlp = spacy.load('en_core_web_sm')
 ```
 
@@ -68,12 +68,12 @@ The ‘_sm’ part indicates it is a smaller version of the library. There are t
 
 It is time to define a function for getting the data from the news site to our Colab Notebook. We do it as,
 
-```
+```python
 def extract_article_from_url(url):
-a = Article(url)
-a.download()
-a.parse()
-return a.text, a.publish_date
+  a = Article(url)
+  a.download()
+  a.parse()
+  return a.text, a.publish_date
 ```
 
 We have used the Article method from the newspaper library. We are getting the text and the date of the news as output.
@@ -82,19 +82,19 @@ We have used the Article method from the newspaper library. We are getting the t
 
 Now, we will create the function that will give us the sentence output from our data for the matched word.
 
-```
+```python
 def sentence_giver(doc, start, end):
-s = start
-while str(doc[s]) != '.':
-s = s - 1
-if s < 0:
-break
-e = end
-while str(doc[e]) != '.':
-e = e + 1
-if e > len(doc) - 1:
-break
-return str(doc[s+1:e])
+  s = start
+  while str(doc[s]) != '.':
+    s = s - 1
+    if s < 0:
+  break
+  e = end
+  while str(doc[e]) != '.':
+    e = e + 1
+    if e > len(doc) - 1:
+  break
+  return str(doc[s+1:e])
 ```
 
 Basically, what this function does is that it traverses till the nearest full stop in the article on both sides of the matched word. So, the indexes are reached both to the left and right of the matched word. Usually, we don’t see a full stop in the middle of the sentence a lot and mostly, it is at the ending of a sentence. Care is taken in case the matched word is in the first sentence or the last sentence of the article. So, we get proper sentences.
@@ -102,36 +102,36 @@ Basically, what this function does is that it traverses till the nearest full st
 ## Creating the Functions for Extracting Locations
 Now, we are creating the function to extract the location of the incident. We do it as below.
 
-```
+```python
 def location_finder(doc):
-locations = []
-sentences = []
-matcher = Matcher(nlp.vocab)
-pattern = [{"ENT_TYPE": "GPE"}]
-matcher.add("Location", [pattern])
-matches = matcher(doc)
-for match_id, start, end in matches:
-sentence = sentence_giver(doc, start, end)
-value = l_detail_filter(sentence)
-if value == 1:
-sentences.append(sentence)
-locations.append(doc[start:end])
-return locations, sentences
+  locations = []
+  sentences = []
+  matcher = Matcher(nlp.vocab)
+  pattern = [{"ENT_TYPE": "GPE"}]
+  matcher.add("Location", [pattern])
+  matches = matcher(doc)
+  for match_id, start, end in matches:
+  sentence = sentence_giver(doc, start, end)
+  value = l_detail_filter(sentence)
+  if value == 1:
+  sentences.append(sentence)
+  locations.append(doc[start:end])
+  return locations, sentences
 ```
 
 So, what we are doing is that we are using Matcher from spaCy to find the words from the text which come with entity type ‘GPE’ which applies for cities, countries, etc. Once we get such a word, we get its ID and with sentence giver, we get the sentence in which that word was found. Now, the function l_detail_filter checks if specific words from our patterns are in the sentence or not. If there are, we save our sentence and location. The function l_detail_filter is as below.
 
-```
+```python
 def l_detail_filter(data):
-data = nlp(data)
-matcher = Matcher(nlp.vocab)
-pattern1 = [{"LOWER": "demonstrators"}]
-matcher.add("L_Filter", [pattern1])
-matches = matcher(data)
-if len(matches) == 0:
-return 0
-else:
-return 1
+  data = nlp(data)
+  matcher = Matcher(nlp.vocab)
+  pattern1 = [{"LOWER": "demonstrators"}]
+  matcher.add("L_Filter", [pattern1])
+  matches = matcher(data)
+  if len(matches) == 0:
+  return 0
+  else:
+  return 1
 ```
 
 As we see, for now, I have set pattern1 as ‘demonstrators’. So, the idea is that if we get ‘demonstrators’ word in a sentence near a location, we can be sure that some people have gathered at that location and this means something is happening at that place! I have only added pattern1 but there can be more patterns added which can further help in selecting more specific sentences and locations.
@@ -139,36 +139,36 @@ As we see, for now, I have set pattern1 as ‘demonstrators’. So, the idea is 
 ## Creating the Functions for Extracting the Number of People Involved
 So, now it’s time to get the number of people involved. The approach is very similar to what we did with locations. We first have the function for finding numbers.
 
-```
+```python
 def number_finder(doc):
-numbers = []
-sentences = []
-matcher = Matcher(nlp.vocab)
-pattern = [{"LIKE_NUM": True}]
-matcher.add("Number", [pattern])
-matches = matcher(doc)
-for match_id, start, end in matches:
-sentence = sentence_giver(doc, start, end)
-value = n_detail_filter(sentence)
-if value == 1:
-sentences.append(sentence)
-numbers.append(str(doc[start:end]))
-return numbers, sentences
+  numbers = []
+  sentences = []
+  matcher = Matcher(nlp.vocab)
+  pattern = [{"LIKE_NUM": True}]
+  matcher.add("Number", [pattern])
+  matches = matcher(doc)
+  for match_id, start, end in matches:
+  sentence = sentence_giver(doc, start, end)
+  value = n_detail_filter(sentence)
+  if value == 1:
+  sentences.append(sentence)
+  numbers.append(str(doc[start:end]))
+  return numbers, sentences
 ```
 
 The IDs of the matched numbers are used to further get the sentences with the expected words with the below shown n_detail_filter function.
 
-```
+```python
 def n_detail_filter(data):
-data = nlp(data)
-matcher = Matcher(nlp.vocab)
-pattern1 = [{"LOWER": "held"}, {"LOWER": "in"}, {"LOWER" : "detention"}]
-matcher.add("N_Filter", [pattern1])
-matches = matcher(data)
-if len(matches) == 0:
-return 0
-else:
-return 1
+  data = nlp(data)
+  matcher = Matcher(nlp.vocab)
+  pattern1 = [{"LOWER": "held"}, {"LOWER": "in"}, {"LOWER" : "detention"}]
+  matcher.add("N_Filter", [pattern1])
+  matches = matcher(data)
+  if len(matches) == 0:
+    return 0
+  else:
+    return 1
 ```
 
 Thus, we get the number of people involved. I have just used the pattern as ‘held in detention’ but other patterns can also be used.
@@ -177,14 +177,14 @@ Thus, we get the number of people involved. I have just used the pattern as ‘h
 
 Now, it’s time to integrate our above individual functions as a part of another function which can be used to get all the results together. We define a function named ‘solver’ to do it.
 
-```
+```python
 def solver(doc):
-n_people, n_s = number_finder(doc)
-print(n_people)
-print(n_s)
-l_places, l_s = location_finder(doc)
-print(l_places)
-print(l_s)
+  n_people, n_s = number_finder(doc)
+  print(n_people)
+  print(n_s)
+  l_places, l_s = location_finder(doc)
+  print(l_places)
+  print(l_s)
 ```
 
 Now, we are ready to try this function on our data.
@@ -192,7 +192,7 @@ Now, we are ready to try this function on our data.
 ## Getting the Outputs
 Now, we will try to get the outputs. First, we will get the article and date through the ‘extract_article_from_url’ function. Then, we will convert the news content to a NLP object.
 
-```
+```python
 link = 'https://www.ndtv.com/world-news/11-dead-as-myanmar-protesters-fight-troops-with-handmade-guns-firebombs-2409266'
 content, date = extract_article_from_url(link)
 doc = nlp(content)
@@ -200,7 +200,7 @@ doc = nlp(content)
 
 Let’s print ‘doc’ to see how it looks.
 
-```
+```python
 print(doc)
 ```
 
