@@ -224,7 +224,7 @@ We get,
 
 So, it works! We have got the number of people involved and also the location of the incident.
 
-## Next Steps
+## Next
 I have just extracted ‘number of people’ and ‘location’ but other attributes could also be extracted. So, I hope this article has provided you the motivation to try out extracting other attributes from a news article. Keep going!
 
 
