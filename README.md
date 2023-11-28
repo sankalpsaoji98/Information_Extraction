@@ -11,7 +11,7 @@ Goal of the project is to extract information via pattern matching with spaCy.
 - [Intro](#intro)
 - [Data](#data)
 - [Results](#results)
-- [Next_Steps](#next_steps)
+- [Next](#next)
 - [Acknowledgements](#acknowledgements)
 
 ## Software
