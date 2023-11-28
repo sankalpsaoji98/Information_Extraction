@@ -34,7 +34,7 @@ We will use this link for our project.
 ## Importing and Downloading the Required Libraries
 For the project, in Google Colab, we will need to import,
 
-```
+```python
 import requests
 import json
 import pandas
@@ -43,7 +43,7 @@ from spacy.matcher import Matcher
 ```
 We will also need to import ‘newspaper’ library which is not pre-installed in Colab. So, we download it as,
 
-```
+```python
 !pip install newspaper3k
 ```
 
@@ -51,7 +51,7 @@ It will take a minute or so to get fully downloaded and installed. But, it will 
 
 Now, we can do further imports,
 
-```
+```python
 import newspaper
 from newspaper import Article
 ```
