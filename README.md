@@ -84,17 +84,17 @@ Now, we will create the function that will give us the sentence output from our 
 
 ```python
 def sentence_giver(doc, start, end):
-  s = start
-  while str(doc[s]) != '.':
-    s = s - 1
-    if s < 0:
-  break
-  e = end
-  while str(doc[e]) != '.':
-    e = e + 1
-    if e > len(doc) - 1:
-  break
-  return str(doc[s+1:e])
+    s = start
+    while str(doc[s]) != '.':
+        s = s - 1
+        if s < 0:
+            break
+    e = end
+    while str(doc[e]) != '.':
+        e = e + 1
+        if e > len(doc) - 1:
+            break
+    return str(doc[s+1:e])
 ```
 
 Basically, what this function does is that it traverses till the nearest full stop in the article on both sides of the matched word. So, the indexes are reached both to the left and right of the matched word. Usually, we don’t see a full stop in the middle of the sentence a lot and mostly, it is at the ending of a sentence. Care is taken in case the matched word is in the first sentence or the last sentence of the article. So, we get proper sentences.
@@ -104,34 +104,34 @@ Now, we are creating the function to extract the location of the incident. We do
 
 ```python
 def location_finder(doc):
-  locations = []
-  sentences = []
-  matcher = Matcher(nlp.vocab)
-  pattern = [{"ENT_TYPE": "GPE"}]
-  matcher.add("Location", [pattern])
-  matches = matcher(doc)
-  for match_id, start, end in matches:
-  sentence = sentence_giver(doc, start, end)
-  value = l_detail_filter(sentence)
-  if value == 1:
-  sentences.append(sentence)
-  locations.append(doc[start:end])
-  return locations, sentences
+    locations = []
+    sentences = []
+    matcher = Matcher(nlp.vocab)
+    pattern = [{"ENT_TYPE": "GPE"}]
+    matcher.add("Location", [pattern])
+    matches = matcher(doc)
+    for match_id, start, end in matches:
+        sentence = sentence_giver(doc, start, end)
+        value = l_detail_filter(sentence)
+        if value == 1:
+            sentences.append(sentence)
+            locations.append(doc[start:end])
+    return locations, sentences
 ```
 
 So, what we are doing is that we are using Matcher from spaCy to find the words from the text which come with entity type ‘GPE’ which applies for cities, countries, etc. Once we get such a word, we get its ID and with sentence giver, we get the sentence in which that word was found. Now, the function l_detail_filter checks if specific words from our patterns are in the sentence or not. If there are, we save our sentence and location. The function l_detail_filter is as below.
 
 ```python
 def l_detail_filter(data):
-  data = nlp(data)
-  matcher = Matcher(nlp.vocab)
-  pattern1 = [{"LOWER": "demonstrators"}]
-  matcher.add("L_Filter", [pattern1])
-  matches = matcher(data)
-  if len(matches) == 0:
-  return 0
-  else:
-  return 1
+    data = nlp(data)
+    matcher = Matcher(nlp.vocab)
+    pattern1 = [{"LOWER": "demonstrators"}]
+    matcher.add("L_Filter", [pattern1])
+    matches = matcher(data)
+    if len(matches) == 0:
+        return 0
+    else:
+        return 1
 ```
 
 As we see, for now, I have set pattern1 as ‘demonstrators’. So, the idea is that if we get ‘demonstrators’ word in a sentence near a location, we can be sure that some people have gathered at that location and this means something is happening at that place! I have only added pattern1 but there can be more patterns added which can further help in selecting more specific sentences and locations.
@@ -141,34 +141,34 @@ So, now it’s time to get the number of people involved. The approach is very s
 
 ```python
 def number_finder(doc):
-  numbers = []
-  sentences = []
-  matcher = Matcher(nlp.vocab)
-  pattern = [{"LIKE_NUM": True}]
-  matcher.add("Number", [pattern])
-  matches = matcher(doc)
-  for match_id, start, end in matches:
-  sentence = sentence_giver(doc, start, end)
-  value = n_detail_filter(sentence)
-  if value == 1:
-  sentences.append(sentence)
-  numbers.append(str(doc[start:end]))
-  return numbers, sentences
+    numbers = []
+    sentences = []
+    matcher = Matcher(nlp.vocab)
+    pattern = [{"LIKE_NUM": True}]
+    matcher.add("Number", [pattern])
+    matches = matcher(doc)
+    for match_id, start, end in matches:
+        sentence = sentence_giver(doc, start, end)
+        value = n_detail_filter(sentence)
+        if value == 1:
+            sentences.append(sentence)
+            numbers.append(str(doc[start:end]))
+    return numbers, sentences
 ```
 
 The IDs of the matched numbers are used to further get the sentences with the expected words with the below shown n_detail_filter function.
 
 ```python
 def n_detail_filter(data):
-  data = nlp(data)
-  matcher = Matcher(nlp.vocab)
-  pattern1 = [{"LOWER": "held"}, {"LOWER": "in"}, {"LOWER" : "detention"}]
-  matcher.add("N_Filter", [pattern1])
-  matches = matcher(data)
-  if len(matches) == 0:
-    return 0
-  else:
-    return 1
+    data = nlp(data)
+    matcher = Matcher(nlp.vocab)
+    pattern1 = [{"LOWER": "held"}, {"LOWER": "in"}, {"LOWER" : "detention"}]
+    matcher.add("N_Filter", [pattern1])
+    matches = matcher(data)
+    if len(matches) == 0:
+        return 0
+    else:
+        return 1
 ```
 
 Thus, we get the number of people involved. I have just used the pattern as ‘held in detention’ but other patterns can also be used.
@@ -179,12 +179,12 @@ Now, it’s time to integrate our above individual functions as a part of anothe
 
 ```python
 def solver(doc):
-  n_people, n_s = number_finder(doc)
-  print(n_people)
-  print(n_s)
-  l_places, l_s = location_finder(doc)
-  print(l_places)
-  print(l_s)
+    n_people, n_s = number_finder(doc)
+    print(n_people)
+    print(n_s)
+    l_places, l_s = location_finder(doc)
+    print(l_places)
+    print(l_s)
 ```
 
 Now, we are ready to try this function on our data.
